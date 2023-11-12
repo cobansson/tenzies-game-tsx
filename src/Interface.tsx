@@ -5,8 +5,13 @@ export interface BoxInt {
     id: string;
 }
 
-export interface diceInt {
+export interface DiceInt {
     id: string;
     value: number;
     isHeld: boolean;
+}
+
+export interface TimeInt {
+    sec: number;
+    min: number;
 }
