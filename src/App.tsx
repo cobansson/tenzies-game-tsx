@@ -3,15 +3,18 @@ import { useEffect, useState } from "react";
 import { DiceInt, TimeInt } from "./Interface";
 import { nanoid } from "nanoid";
 import ReactConfetti from "react-confetti";
+import { diceImagesArray } from "./Images";
 
 function App() {
   const arrayOfDices = (): DiceInt[] => {
     const arr: DiceInt[] = [];
     for (let i = 0; i < 10; i++) {
+      const diceValue: number = Math.floor(Math.random() * 6 + 1);
       arr.push({
         id: nanoid(),
-        value: Math.floor(Math.random() * 6 + 1),
+        value: diceValue,
         isHeld: false,
+        image: diceImagesArray[diceValue - 1],
       });
     }
     return arr;
@@ -51,15 +54,22 @@ function App() {
           : prevDice;
       });
     });
+
+    setDices((prevDices) =>
+      prevDices.map((prevDice) => ({
+        ...prevDice,
+        image: diceImagesArray[prevDice.value - 1],
+      }))
+    );
     setNumberClicked((prevNumberClicked) => prevNumberClicked + 1);
   };
 
-  const restartTimer = () => {
+  const restartTimer = (): void => {
     const newIntervalId = setInterval(updateTimer, 1000);
     setIntervalId(newIntervalId);
   };
 
-  const updateTimer = () => {
+  const updateTimer = (): void => {
     setTime((prevTime) => {
       if (prevTime.sec < 59) {
         return {
@@ -77,25 +87,25 @@ function App() {
 
   const selectDice = (diceID: string) => {
     !tenzies &&
-    setDices((prevDices) => {
-      return prevDices.map((prevDice) => {
-        return prevDice.id === diceID
-          ? {
-              ...prevDice,
-              isHeld: !prevDice.isHeld,
-            }
-          : prevDice;
+      setDices((prevDices) => {
+        return prevDices.map((prevDice) => {
+          return prevDice.id === diceID
+            ? {
+                ...prevDice,
+                isHeld: !prevDice.isHeld,
+              }
+            : prevDice;
+        });
       });
-    });
   };
 
   const randomNumBoxes = dices.map((dice) => (
     <Box
       key={dice.id}
-      randomNumber={dice.value}
       selectDice={selectDice}
       isHeld={dice.isHeld}
       id={dice.id}
+      image={dice.image}
     />
   ));
 
