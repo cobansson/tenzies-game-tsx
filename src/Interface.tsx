@@ -18,3 +18,21 @@ export interface TimeInt {
     sec: number;
     min: number;
 }
+
+export interface ScoreInt {
+    rolled: number;
+    time: string;
+}
+
+export interface ScoreDataInt {
+    nickname: string;
+    rolled: number;
+    time: string;
+}
+
+export interface ScoreListInt {
+    id: string;
+    nickname: string;
+    rolled: number;
+    time: string;
+}

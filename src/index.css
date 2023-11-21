@@ -44,12 +44,31 @@ h1 {
   margin-bottom: 0.2em;
 }
 
+h2 {
+  font-size: 1.6rem;
+}
+
+ul {
+  gap: 10px; /* Adjust the gap between items as needed */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  padding: 10px;
+  text-align: center;
+  background-color: #239450;
+  color: #fff;
+  margin-top: 1em;
+}
+
 button {
   width: 130px;
   line-height: 2;
   font-size: 1.4rem;
-  color: #FFF;
-  background-color: #5035FF;
+  color: #fff;
+  background-color: #5035ff;
   border: none;
   border-radius: 3.81px;
   margin-top: 1em;
@@ -95,4 +114,140 @@ p {
 
 .random-number {
   width: 50px;
+}
+
+.score-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  background-color: #334652;
+  width: 60%;
+  margin: 0 auto;
+  padding: 1em;
+  border-radius: 10px;
+  height: 250px;
+  overflow: auto;
+}
+
+.score-section-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  background-color: #334652;
+  width: 60%;
+  margin: 0 auto;
+  padding: 1em;
+  border-radius: 10px;
+  height: 250px;
+  overflow: auto;
+}
+
+.score-item {
+  display: grid;
+  grid-template: 20px / 100px 70px 70px;
+  border-radius: 3px;
+}
+
+.nickname {
+  justify-self: flex-start;
+}
+
+.score-section h3 {
+  margin: 1em 0 0 0;
+  font-size: 1.3rem;
+  color: #3be67f;
+  font-weight: 500;
+}
+
+.score-section-empty h3 {
+  margin: 5em;
+  font-size: 1rem;
+  width: 50%;
+  padding: 0;
+  color: #3be67f;
+  font-weight: 500;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5em;
+  padding-top: 1em;
+}
+
+.input-nickname {
+  border-radius: 6px;
+  border: none;
+  background-color: #f5f5f5;
+  padding: 0.8em 0em;
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0b2434;
+  font-weight: 500;
+  text-align: center;
+  width: 160px;
+  height: 40px;
+}
+
+.input-nickname::placeholder {
+  font-size: 1rem;
+  color: #0b2434;
+  font-weight: 500;
+  text-align: center;
+}
+
+.input-nickname:focus {
+  outline: none;
+}
+
+.btns-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  gap: 1em;
+  align-items: center;
+  padding: 1em;
+}
+
+.send-score-btn {
+  font-size: 1.2rem;
+  width: 100%;
+  background-color: #239450;
+}
+
+.show-scores-btn {
+  width: 150px;
+  font-size: 1.2rem;
+  line-height: 2;
+  background-color: #0b2434;
+  margin: 0;
+  padding: 0;
+}
+
+.new-game-btn {
+  width: 150px;
+  font-size: 1.2rem;
+  background-color: #5035ff;
+  margin: 0;
+  padding: 0;
+}
+
+/* For WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4CAF50; /* Change this to your desired thumb color */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #334652; /* Change this to your desired track color */
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
 }

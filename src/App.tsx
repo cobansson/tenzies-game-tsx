@@ -1,9 +1,11 @@
 import Box from "./Box";
 import { useEffect, useState } from "react";
-import { DiceInt, TimeInt } from "./Interface";
+import { DiceInt, TimeInt, ScoreListInt, ScoreDataInt } from "./Interface";
 import { nanoid } from "nanoid";
 import ReactConfetti from "react-confetti";
 import { diceImagesArray } from "./Images";
+import { addDoc, onSnapshot } from "firebase/firestore";
+import { dicesCollection } from "./firebase";
 
 function App() {
   const arrayOfDices = (): DiceInt[] => {
@@ -22,12 +24,69 @@ function App() {
 
   const [dices, setDices] = useState<DiceInt[]>(arrayOfDices());
   const [tenzies, setTenzies] = useState<boolean>(false);
+  const [scoresIsShown, setScoresIsShown] = useState<boolean>(false);
   const [numberClicked, setNumberClicked] = useState<number>(0);
-  const [intervalId, setIntervalId] = useState<number>(0);
+  const [intervalId, setIntervalId] = useState<number | NodeJS.Timeout>(0);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [time, setTime] = useState<TimeInt>({
     sec: 0,
     min: 0,
   });
+  const [username, setUsername] = useState<string>("");
+  const [scoreData, setScoreData] = useState<ScoreDataInt>({
+    nickname: "",
+    rolled: 0,
+    time: "",
+  });
+  const [scoresArr, setScoresArr] = useState<ScoreListInt[]>([
+    {
+      id: "",
+      nickname: "",
+      rolled: 0,
+      time: "",
+    },
+  ]);
+
+  const showTime =
+    time.sec < 10
+      ? `0${time.min} : 0${time.sec}`
+      : `0${time.min} : ${time.sec}`;
+
+  const scoreBoard = scoresArr.map((scoreArr) => (
+    <li key={scoreArr.id} className="score-item">
+      <span className="nickname">{scoreArr.nickname}</span>
+      <span className="rolled">{scoreArr.rolled}</span>
+      <span className="time">{scoreArr.time}</span>
+    </li>
+  ));
+
+  useEffect(() => {
+    const unsub = onSnapshot(dicesCollection, (snapshot) => {
+      const scoresData: ScoreListInt[] = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          nickname: data.nickname,
+          rolled: data.rolled,
+          time: data.time,
+        };
+      });
+      setScoresArr(
+        scoresData.sort((b, a) => {
+          return b.rolled - a.rolled;
+        })
+      );
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    setScoreData({
+      nickname: username,
+      rolled: numberClicked,
+      time: showTime,
+    });
+  }, [username, numberClicked, showTime]);
 
   useEffect(() => {
     const isValueMatching: boolean = dices.every(
@@ -38,7 +97,7 @@ function App() {
   }, [dices, intervalId]);
 
   useEffect(() => {
-    const intervalId = setInterval(updateTimer, 1000);
+    const intervalId: NodeJS.Timeout = setInterval(updateTimer, 1000);
     setIntervalId(intervalId);
     return () => clearInterval(intervalId);
   }, []);
@@ -109,16 +168,26 @@ function App() {
     />
   ));
 
-  const showTime =
-    time.sec < 10 ? (
-      <h2>
-        0{time.min} : 0{time.sec}
-      </h2>
-    ) : (
-      <h2>
-        0{time.min} : {time.sec}
-      </h2>
-    );
+  const setNickname = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setUsername(value);
+  };
+
+  const sendScore = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const newScoreData = scoreData;
+      setIsSubmitted(prevIsSubmitted => !prevIsSubmitted);
+      await addDoc(dicesCollection, newScoreData);
+    } catch (error) {
+      console.error("Error submitting score:", error);
+    }
+  };
+
+  const showScore = () => {
+    setScoresIsShown((prevScoresIsShown) => !prevScoresIsShown);
+  };
 
   return (
     <body>
@@ -144,19 +213,55 @@ function App() {
             <div className="random-number-boxes">{randomNumBoxes}</div>
             <h2>Times rolled: {numberClicked}</h2>
             <h2>Took to win: {showTime}</h2>
-            <button
-              onClick={() => {
-                setDices(arrayOfDices);
-                setNumberClicked(0);
-                setTime({
-                  min: 0,
-                  sec: 0,
-                });
-                restartTimer();
-              }}
-            >
-              NEW GAME
-            </button>
+            {!scoresIsShown ? (
+              <div className="score-section">
+                <h3>Send your score</h3>
+                <form onSubmit={sendScore} className="form">
+                  <input
+                    type="text"
+                    onChange={setNickname}
+                    placeholder="your nickname"
+                    className="input-nickname"
+                    required
+                    maxLength={10}
+                  />
+                  <button 
+                    className="send-score-btn"
+                    disabled={isSubmitted}>SEND SCORE</button>
+                </form>
+              </div>
+            ) : ( scoresArr.length > 0 ? (
+              <div className="score-section">
+              <h3>Scoreboard</h3>
+              <ul>{scoreBoard}</ul>
+            </div>
+            ) : (
+              <div className="score-section-empty">
+                <h3>Nothing to show here</h3>
+              </div>
+            )
+            )}
+            <div className="btns-container">
+              <button className="show-scores-btn" onClick={showScore}>
+                {scoresIsShown ? "HIDE SCORES" : "SHOW SCORES"}
+              </button>
+              <button
+              className="new-game-btn"
+                onClick={() => {
+                  setDices(arrayOfDices);
+                  setNumberClicked(0);
+                  setTime({
+                    min: 0,
+                    sec: 0,
+                  });
+                  restartTimer();
+                  setScoresIsShown(false);
+                  setIsSubmitted(false);
+                }}
+              >
+                NEW GAME
+              </button>
+            </div>
           </main>
         </div>
       )}
